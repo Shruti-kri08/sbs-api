@@ -54,11 +54,11 @@ Router.post('/login',async(req,res)=>{
     try{
         const data=await User.find({email:req.body.email})
         if( data.length==0){
-            return res.status(500).json({error:"email not registered"})
+            return res.status(400).json({error:"email not registered"})
         }
         const isMatch=await bcrypt.compare(req.body.password,data[0].password)
         if(!isMatch){
-           return res.status(500).json({error:"password not matched"})
+           return res.status(400).json({error:"password not matched"})
         }
         console.log("you are logined");
         console.log(data);
