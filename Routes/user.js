@@ -3,6 +3,7 @@ const express = require('express')
 const Router = express.Router()
 const User = require('../Models/User')
 const bcrypt = require('bcrypt')
+const jwt=require('jsonwebtoken')
 
 
 //signup api
@@ -15,7 +16,6 @@ Router.post('/signup', async (req, res) => {
                 error: "email already registered"
             })
         }
-
         const hash = await bcrypt.hash(req.body.password, 10)
 
         const data = new User(
@@ -27,7 +27,6 @@ Router.post('/signup', async (req, res) => {
 
             }
         )
-
         const result = await data.save()
         console.log("new user signup");
         console.log(result);
@@ -42,7 +41,7 @@ Router.post('/signup', async (req, res) => {
     catch (err) {
 
         res.status(500).json({
-            err: "somthing is worng",
+            err: "something is worng",
             error: err
         })
     }
@@ -60,11 +59,25 @@ Router.post('/login',async(req,res)=>{
         if(!isMatch){
            return res.status(400).json({error:"password not matched"})
         }
-        console.log("you are logined");
-        console.log(data);
+        // console.log("you are logined");
+        // console.log(data);
         
-        
+        //creating token
+        const token=jwt.sign({
+            fullName:data[0].fullName,
+            email:data[0].email,
+            userId:data[0]._id
 
+        },'SBS-API-123',{expiresIn:"31d"})
+        // console.log(token);
+
+     res.status(200).json({
+         fullName:data[0].fullName,
+            email:data[0].email,
+            userId:data[0]._id,
+            token:token
+
+        })
     }
     catch(err){
            res.status(500).json({
